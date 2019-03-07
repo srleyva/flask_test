@@ -9,6 +9,7 @@ from api.services.source_tree import AccountSourceTree
 ns = api.namespace('jobs', description='Job Related information')
 
 job_queue = None
+data_engine_job = DataEngineJob()
 
 
 @ns.route('/')
@@ -37,13 +38,13 @@ class JobsCollection(Resource):
 class JobsItems(Resource):
     def get(self, job_id):
         '''Get job information'''
-        job = DataEngineJob.query.get(job_id)
-        return jsonify(JobSchema.dump(job).data)
+        job = data_engine_job.query.get(job_id)
+        return jsonify(JobSchema().dump(job).data)
 
     @api.response(204, 'Job successfully deleted.')
     def delete(self, job_id):
         '''Delete a job'''
-        job = DataEngineJob.query.get(job_id)
+        job = data_engine_job.query.get(job_id)
         queue(job_queue).remove(job)
         return {'success': 'true'}, 204
 
@@ -53,7 +54,7 @@ class JobPriority(Resource):
     @api.response(204, 'Job successfully updated.')
     def put(self, job_id, priority):
         '''Set the priority of job'''
-        job = DataEngineJob.query.get(job_id)
+        job = data_engine_job.query.get(job_id)
         job.priority = priority
         queue(job_queue).set(job)
         return {"success": "true"}, 200
