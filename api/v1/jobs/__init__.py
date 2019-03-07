@@ -8,25 +8,27 @@ from api.services.source_tree import AccountSourceTree
 
 ns = api.namespace('jobs', description='Job Related information')
 
+job_queue = None
+
 
 @ns.route('/')
 class JobsCollection(Resource):
     @api.doc('peek')
     def get(self):
         '''Peek at the top Job'''
-        next_job = JobQueue().peek()
+        next_job = queue(job_queue).peek()
         return jsonify(JobSchema().dump(next_job).data)
 
     @api.doc('refresh')
     def put(self):
         '''Refresh the Jobs Queue'''
-        JobQueue().refresh()
+        queue(job_queue).refresh()
         return {'success': 'true'}, 200
 
     @api.doc('pop')
     def delete(self):
         '''Pop a Job off of the job queue'''
-        next_job = JobQueue().pop()
+        next_job = queue(job_queue).pop()
         return jsonify(JobSchema().dump(next_job).data)
 
 
@@ -42,7 +44,7 @@ class JobsItems(Resource):
     def delete(self, job_id):
         '''Delete a job'''
         job = DataEngineJob.query.get(job_id)
-        JobQueue().remove(job)
+        queue(job_queue).remove(job)
         return {'success': 'true'}, 204
 
 
@@ -53,7 +55,7 @@ class JobPriority(Resource):
         '''Set the priority of job'''
         job = DataEngineJob.query.get(job_id)
         job.priority = priority
-        JobQueue().set(job)
+        queue(job_queue).set(job)
         return {"success": "true"}, 200
 
 
@@ -64,3 +66,9 @@ class JobSourceTree(Resource):
         tree = AccountSourceTree(account_id)
         tree.refresh()
         return jsonify(tree.data)
+
+
+def queue(job_queue):
+    if job_queue is None:
+        job_queue = JobQueue()
+    return job_queue
