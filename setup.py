@@ -10,7 +10,6 @@ setup(
     description='sample api to show off deployment pipeline',
     url='https://github.com/srleyva/sample_api',
     author='Stephen Leyva',
-
     classifiers=[
         'Development Status :: 1 - Planning',
         'Intended Audience :: Developers',
@@ -18,11 +17,9 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
     ],
-
     keywords='rest restful api flask swagger openapi flask-restplus',
-
-    packages=find_packages(),
-
+    zip_safe=True,
+    packages=find_packages(exclude=['tests']),
     install_requires=required,
-    entry_points={'console_scripts': ['job_api=api:app.main']}
+    entry_points={'console_scripts': ['job_api=api:main']}
     )
