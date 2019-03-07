@@ -46,7 +46,7 @@ class JobsItems(Resource):
         return {'success': 'true'}, 204
 
 
-@ns.route('<int:job_id>/priority/<int:priority>')
+@ns.route('/<int:job_id>/priority/<int:priority>')
 class JobPriority(Resource):
     @api.response(204, 'Job successfully updated.')
     def put(self, job_id, priority):
