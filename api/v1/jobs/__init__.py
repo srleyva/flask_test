@@ -9,6 +9,7 @@ from api.services.source_tree import AccountSourceTree
 ns = api.namespace('jobs', description='Job Related information')
 
 job_queue = None
+account_tree = AccountSourceTree
 data_engine_job = DataEngineJob()
 
 
@@ -64,12 +65,12 @@ class JobPriority(Resource):
 class JobSourceTree(Resource):
     def get(self, account_id):
         '''Get Source tree for particular account'''
-        tree = AccountSourceTree(account_id)
+        tree = account_tree(account_id)
         tree.refresh()
         return jsonify(tree.data)
 
 
-def queue(job_queue):
+def queue(job_queue):  # pragma: no cover
     if job_queue is None:
         job_queue = JobQueue()
     return job_queue

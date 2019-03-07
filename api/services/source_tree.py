@@ -59,12 +59,12 @@ class AccountSourceTree:
 
     def __init__(self, account_id):
         self.account_id = account_id
-
-    def refresh(self):
         self.data = {
             "account_id": self.account_id,
             "dag": []
         }
+
+    def refresh(self):
         """Refreshes the source tree from the database.
         """
         sql = self.SOURCE_TREE_SQL.format(account_id=self.account_id)

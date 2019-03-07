@@ -13,7 +13,7 @@ api = Api(version='1.0', title='Job API',
 
 
 @api.errorhandler
-def default_error_handler(e):
+def default_error_handler(e):  # pragma: no cover
     message = 'An unhandled exception occurred.'
     log.exception(message)
 
@@ -22,6 +22,6 @@ def default_error_handler(e):
 
 
 @api.errorhandler(NoResultFound)
-def database_not_found_error_handler(e):
+def database_not_found_error_handler(e):  # pragma: no cover
     log.warning(traceback.format_exc())
     return {'message': 'database result was required but none was found.'}, 404
