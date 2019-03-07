@@ -1,5 +1,9 @@
 FROM python:alpine
 
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev
+
 WORKDIR /tmp/wdir
 
 ADD requirements.txt .

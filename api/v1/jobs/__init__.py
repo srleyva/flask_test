@@ -15,19 +15,19 @@ class JobsCollection(Resource):
     def get(self):
         '''Peek at the top Job'''
         next_job = JobQueue().peek()
-        return jsonify(JobSchema().dump(next_job).data), 200
+        return jsonify(JobSchema().dump(next_job).data)
 
     @api.doc('refresh')
     def put(self):
         '''Refresh the Jobs Queue'''
-        JobQueue.refresh()
+        JobQueue().refresh()
         return {'success': 'true'}, 200
 
     @api.doc('pop')
     def delete(self):
         '''Pop a Job off of the job queue'''
         next_job = JobQueue().pop()
-        return jsonify(JobSchema().dump(next_job).data), 200
+        return jsonify(JobSchema().dump(next_job).data)
 
 
 @ns.route('/<int:job_id>')
@@ -36,7 +36,7 @@ class JobsItems(Resource):
     def get(self, job_id):
         '''Get job information'''
         job = DataEngineJob.query.get(job_id)
-        return jsonify(JobSchema.dump(job).data), 200
+        return jsonify(JobSchema.dump(job).data)
 
     @api.response(204, 'Job successfully deleted.')
     def delete(self, job_id):
@@ -63,4 +63,4 @@ class JobSourceTree(Resource):
         '''Get Source tree for particular account'''
         tree = AccountSourceTree(account_id)
         tree.refresh()
-        return jsonify(tree.data), 200
+        return jsonify(tree.data)
