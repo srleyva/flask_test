@@ -2,6 +2,8 @@ import logging
 import traceback
 
 from flask_restplus import Api
+from flask_jwt_extended.exceptions import (
+        NoAuthorizationError, InvalidHeaderError)
 from sqlalchemy.orm.exc import NoResultFound
 
 from api import settings
@@ -25,3 +27,9 @@ def default_error_handler(e):  # pragma: no cover
 def database_not_found_error_handler(e):  # pragma: no cover
     log.warning(traceback.format_exc())
     return {'message': 'database result was required but none was found.'}, 404
+
+
+@api.errorhandler(NoAuthorizationError)
+@api.errorhandler(InvalidHeaderError)
+def no_token_found(e):  # pragma: no cover
+    return {'message': 'Bad Token'}, 400

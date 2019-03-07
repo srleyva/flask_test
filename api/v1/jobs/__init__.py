@@ -1,5 +1,6 @@
 from flask import jsonify
 from flask_restplus import Resource
+from flask_jwt_extended import jwt_required
 
 from api.v1.restplus import api
 from api.models.data_engine_job import DataEngineJob, JobSchema
@@ -7,6 +8,14 @@ from api.services.job_queue import JobQueue
 from api.services.source_tree import AccountSourceTree
 
 ns = api.namespace('jobs', description='Job Related information')
+parser = ns.parser()
+parser.add_argument(
+    'Authorization',
+    type=str,
+    location='headers',
+    help='Bearer Access Token',
+    required=True
+    )
 
 job_queue = None
 account_tree = AccountSourceTree
@@ -15,18 +24,24 @@ data_engine_job = DataEngineJob()
 
 @ns.route('/')
 class JobsCollection(Resource):
+    @jwt_required
+    @ns.doc(parser=parser)
     @api.doc('peek')
     def get(self):
         '''Peek at the top Job'''
         next_job = queue(job_queue).peek()
         return jsonify(JobSchema().dump(next_job).data)
 
+    @jwt_required
+    @ns.doc(parser=parser)
     @api.doc('refresh')
     def put(self):
         '''Refresh the Jobs Queue'''
         queue(job_queue).refresh()
         return {'success': 'true'}, 200
 
+    @jwt_required
+    @ns.doc(parser=parser)
     @api.doc('pop')
     def delete(self):
         '''Pop a Job off of the job queue'''
@@ -37,11 +52,15 @@ class JobsCollection(Resource):
 @ns.route('/<int:job_id>')
 @api.response(404, 'Job Not Found')
 class JobsItems(Resource):
+    @jwt_required
+    @ns.doc(parser=parser)
     def get(self, job_id):
         '''Get job information'''
         job = data_engine_job.query.get(job_id)
         return jsonify(JobSchema().dump(job).data)
 
+    @jwt_required
+    @ns.doc(parser=parser)
     @api.response(204, 'Job successfully deleted.')
     def delete(self, job_id):
         '''Delete a job'''
@@ -52,6 +71,8 @@ class JobsItems(Resource):
 
 @ns.route('/<int:job_id>/priority/<int:priority>')
 class JobPriority(Resource):
+    @jwt_required
+    @ns.doc(parser=parser)
     @api.response(204, 'Job successfully updated.')
     def put(self, job_id, priority):
         '''Set the priority of job'''
@@ -63,6 +84,8 @@ class JobPriority(Resource):
 
 @ns.route('/<int:account_id>/source_tree')
 class JobSourceTree(Resource):
+    @jwt_required
+    @ns.doc(parser=parser)
     def get(self, account_id):
         '''Get Source tree for particular account'''
         tree = account_tree(account_id)

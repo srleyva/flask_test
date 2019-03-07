@@ -29,11 +29,13 @@ class V1ServiceTest(unittest.TestCase):
         self.mock_account_tree = Mock(AccountSourceTree)
         api.v1.jobs.data_engine_job = self.mock_data_engine
         api.v1.jobs.account_tree = self.mock_account_tree
+        token = json.loads(self.app.get('v1/system/token').data)['token']
+        self.headers = {'Authorization': f'Bearer {token}'}
 
     # Test System Routes
     def test_system_health(self):
         '''Test GET method on the /v1/system/health endpoint returns 200'''
-        response = self.app.get('/v1/system/health')
+        response = self.app.get('v1/system/health')
         self.assertEqual(response.status_code, 200)
 
     def test_system_metrics(self):
@@ -45,7 +47,7 @@ class V1ServiceTest(unittest.TestCase):
     def test_jobs_peek(self):
         '''Test GET method on /v1/jobs/'''
         self.mock_job_queue.peek.return_value = test_job
-        response = self.app.get('/v1/jobs/')
+        response = self.app.get('/v1/jobs/', headers=self.headers)
 
         self.mock_job_queue.peek.assert_called()
         self.assertEqual(response.status_code, 200)
@@ -57,7 +59,7 @@ class V1ServiceTest(unittest.TestCase):
 
     def test_job_refresh(self):
         '''Test PUT method on /v1/jobs/'''
-        response = self.app.put('/v1/jobs/')
+        response = self.app.put('/v1/jobs/', headers=self.headers)
 
         self.mock_job_queue.refresh.assert_called()
         self.assertEqual(response.status_code, 200)
@@ -65,7 +67,7 @@ class V1ServiceTest(unittest.TestCase):
     def test_job_pop(self):
         '''Test DELETE method on /v1/jobs/'''
         self.mock_job_queue.pop.return_value = test_job
-        response = self.app.delete('/v1/jobs/')
+        response = self.app.delete('/v1/jobs/', headers=self.headers)
 
         self.mock_job_queue.pop.assert_called()
         self.assertEqual(response.status_code, 200)
@@ -79,7 +81,7 @@ class V1ServiceTest(unittest.TestCase):
     def test_get_job_item(self):
         '''Test GET method on /v1/jobs/1'''
         self.mock_data_engine.query.get.return_value = test_job
-        response = self.app.get('/v1/jobs/1')
+        response = self.app.get('/v1/jobs/1', headers=self.headers)
 
         self.mock_data_engine.query.get.assert_called_with(1)
         self.assertEqual(response.status_code, 200)
@@ -92,7 +94,7 @@ class V1ServiceTest(unittest.TestCase):
     def test_delete_job_item(self):
         '''Test DELETE method on /v1/jobs/1'''
         self.mock_data_engine.query.get.return_value = test_job
-        response = self.app.delete('/v1/jobs/1')
+        response = self.app.delete('/v1/jobs/1', headers=self.headers)
 
         self.assertEqual(response.status_code, 204)
         self.mock_data_engine.query.get.assert_called_with(1)
@@ -101,7 +103,7 @@ class V1ServiceTest(unittest.TestCase):
     def test_set_priority_job(self):
         '''Test GET method on /1/priority/1'''
         self.mock_data_engine.query.get.return_value = test_job
-        response = self.app.put('/v1/jobs/1/priority/1')
+        response = self.app.put('/v1/jobs/1/priority/1', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         expected = test_job
@@ -116,7 +118,7 @@ class V1ServiceTest(unittest.TestCase):
             "dag": []
         }
         self.mock_account_tree.return_value = self.mock_account_tree
-        response = self.app.get('/v1/jobs/1/source_tree')
+        response = self.app.get('/v1/jobs/1/source_tree', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.mock_account_tree.assert_called_with(1)

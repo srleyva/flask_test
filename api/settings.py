@@ -11,3 +11,6 @@ RESTPLUS_ERROR_404_HELP = False
 # SQLAlchemy settings
 SQLALCHEMY_DATABASE_URI = 'postgres://postgres:@postgres:5432/circle_test'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# JWT
+JWT_SECRET_KEY = 'secret-key'

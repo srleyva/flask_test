@@ -1,12 +1,14 @@
 import logging.config
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 
 from api import settings
 from api.v1.namespaces import blueprint, configure_api
 from api.databases import initialize_db
 
 app = Flask(__name__)
+jwt = JWTManager(app)
 
 # logging_conf_path = os.path.normpath(
 #         os.path.join(os.path.dirname(__file__), '../logging.conf'))
@@ -22,6 +24,7 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
+    flask_app.config['JWT_SECRET_KEY'] = settings.JWT_SECRET_KEY
 
 
 def initialize_app(flask_app, job_queue=None):
