@@ -1,5 +1,15 @@
 version: '3'
 services:
+  test:
+    build: tests/integration/
+    environment:
+      API_HOST: 'data_engine_api:5000'
+      PSQL_HOST: 'postgres'
+    depends_on:
+      - data_engine_api
+      - postgres
+    networks:
+      - overlay
   postgres:
     image: postgres:9.4
     volumes:
@@ -8,6 +18,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: circle_test
       POSTGRES_PASSWORD: ""
+    networks:
+      - overlay
     ports:
      - "5432:5432"
   data_engine_api:
@@ -20,8 +32,13 @@ services:
       - "postgres"
     depends_on:
       - postgres
+    networks:
+      - overlay
     ports:
      - "5000:5000"
 
 volumes:
   data_engine_api_vol:
+
+networks:
+  overlay:

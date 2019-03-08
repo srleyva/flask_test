@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --upgrade postgresql-client git bash
+RUN apk add --upgrade postgresql-client git bash jq curl
 
 WORKDIR /tmp/wdir
 

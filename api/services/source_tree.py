@@ -57,7 +57,7 @@ class AccountSourceTree:
     ORDER BY rds.report_id;
     """ # NOQA
 
-    def __init__(self, account_id):
+    def __init__(self, account_id, db=db):
         self.account_id = account_id
         self.data = {
             "account_id": self.account_id,

@@ -19,7 +19,7 @@ test_job.state = "running"
 
 
 class V1ServiceTest(unittest.TestCase):
-    '''Tests for the Person endpoint'''
+    '''Tests for the V1 endpoints'''
     def setUp(self):
         '''Set some state for each test in this class'''
         api.app.testing = True

@@ -27,14 +27,21 @@ class JobsCollection(Resource):
     @jwt_required
     @ns.doc(parser=parser)
     @api.doc('peek')
+    @api.response(404, 'No Jobs in Queue')
     def get(self):
         '''Peek at the top Job'''
         next_job = queue(job_queue).peek()
+        if next_job is None:
+            self.api.abort(
+                404,
+                f'No Jobs in queue'
+            )
         return jsonify(JobSchema().dump(next_job).data)
 
     @jwt_required
     @ns.doc(parser=parser)
     @api.doc('refresh')
+    @api.response(404, 'No Jobs in Queue')
     def put(self):
         '''Refresh the Jobs Queue'''
         queue(job_queue).refresh()
@@ -46,6 +53,11 @@ class JobsCollection(Resource):
     def delete(self):
         '''Pop a Job off of the job queue'''
         next_job = queue(job_queue).pop()
+        if next_job is None:
+            self.api.abort(
+                404,
+                f'No Jobs in queue'
+            )
         return jsonify(JobSchema().dump(next_job).data)
 
 
@@ -54,17 +66,29 @@ class JobsCollection(Resource):
 class JobsItems(Resource):
     @jwt_required
     @ns.doc(parser=parser)
+    @api.response(404, 'Job not found.')
     def get(self, job_id):
         '''Get job information'''
         job = data_engine_job.query.get(job_id)
+        if job is None:
+            self.api.abort(
+                404,
+                f'Job not found {job_id}'
+            )
         return jsonify(JobSchema().dump(job).data)
 
     @jwt_required
     @ns.doc(parser=parser)
     @api.response(204, 'Job successfully deleted.')
+    @api.response(404, 'Job not found.')
     def delete(self, job_id):
         '''Delete a job'''
         job = data_engine_job.query.get(job_id)
+        if job is None:
+            self.api.abort(
+                404,
+                f'Job not found {job_id}'
+            )
         queue(job_queue).remove(job)
         return {'success': 'true'}, 204
 
@@ -74,9 +98,15 @@ class JobPriority(Resource):
     @jwt_required
     @ns.doc(parser=parser)
     @api.response(204, 'Job successfully updated.')
+    @api.response(404, 'Job not found.')
     def put(self, job_id, priority):
         '''Set the priority of job'''
         job = data_engine_job.query.get(job_id)
+        if job is None:
+            self.api.abort(
+                404,
+                f'Job not found {job_id}'
+            )
         job.priority = priority
         queue(job_queue).set(job)
         return {"success": "true"}, 200

@@ -25,9 +25,10 @@ class JobQueue(metaclass=__Singleton):
         'new', 'retryable_failure', 'delayed_start'
     ])
 
-    def __init__(self):
+    def __init__(self, data_engine_job=DataEngineJob):
         self.lock = threading.Lock()
         self.jobs = []
+        self.data_engine_job = data_engine_job
         self.refresh()
 
     def set(self, job):
@@ -89,7 +90,8 @@ class JobQueue(metaclass=__Singleton):
         self.lock.acquire()
         try:
             self.jobs.clear()
-            result = DataEngineJob.query.filter(self.QUEUED_JOBS_FILTER).all()
+            result = self.data_engine_job.query.filter(
+                self.QUEUED_JOBS_FILTER).all()
             for job in result:
                 self.jobs.append(job)
 
