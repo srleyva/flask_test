@@ -4,7 +4,10 @@ import unittest
 from unittest.mock import Mock
 
 from api.services.job_queue import JobQueue
+from api.services.source_tree import AccountSourceTree
+
 from api.models.data_engine_job import DataEngineJob
+from api.databases import db
 
 
 class JobQueueServiceTest(unittest.TestCase):
@@ -61,3 +64,39 @@ def _create_test_jobs(id, priority, created_at=datetime.now(), state="new"):
     test_job.state = state
     test_job.priority = priority
     return test_job
+
+
+class AccountTreeServiceTest(unittest.TestCase):
+    '''Tests for the V1 endpoints'''
+    def setUp(self):
+        '''Set some state for each test in this class'''
+        self.mock_db = Mock(db)
+        self.source_tree = AccountSourceTree(1, database=self.mock_db)
+
+    def test_account_tree_init(self):
+        data = {
+            "account_id": 1,
+            "dag": []
+        }
+        self.assertEqual(data, self.source_tree.data)
+        self.assertEqual(1, self.source_tree.account_id)
+
+    def test_refresh(self):
+        test_return = [
+            {
+                "parent_id": 1,
+                "report_id": 123
+            },
+            {
+                "parent_id": 1,
+                "report_id": 122
+            }
+        ]
+        self.mock_db.engine.execute.return_value = test_return
+        self.source_tree.refresh()
+        self.mock_db.engine.execute.assert_called_with(
+            self.source_tree.SOURCE_TREE_SQL.format(account_id=1))
+        # TODO Get with john to test response
+        # self.assertIn(
+        #     test_return,
+        #     self.source_tree.data["dag"])

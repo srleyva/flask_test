@@ -57,7 +57,8 @@ class AccountSourceTree:
     ORDER BY rds.report_id;
     """ # NOQA
 
-    def __init__(self, account_id, db=db):
+    def __init__(self, account_id, database=db):
+        self.db = database
         self.account_id = account_id
         self.data = {
             "account_id": self.account_id,
@@ -68,7 +69,7 @@ class AccountSourceTree:
         """Refreshes the source tree from the database.
         """
         sql = self.SOURCE_TREE_SQL.format(account_id=self.account_id)
-        result = db.engine.execute(sql)
+        result = self.db.engine.execute(sql)
         for row in result:
             node_id = f"r{row['report_id']}"
             node = self._find_node_(node_id)
