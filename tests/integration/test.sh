@@ -22,6 +22,17 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
   [ "$health" == "System is healthy" ]
 }
 
+@test "test protected get routes" {
+  for route in $(curl -s http://localhost:5000/v1/swagger.json | jq -r '.paths | to_entries[].key' | grep -v system | grep -v priority); do 
+    route=$(echo $route | sed 's/{account_id}/1/')
+    route=$(echo $route | sed 's/{job_id}/1/')
+    route=$(echo $route | sed 's/{priority}/1/')
+    printf 'Trying: %s\n' "$route"
+    code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/v1$route)
+    [ "$code" -eq 400 ]
+  done
+}
+
 @test "test peek job endpoint" {
   expected_job='{"created_at":"2018-10-23T00:05:30+00:00","id":1,"priority":20,"state":"new"}'
   actual_job=$(curl -s -X GET --header 'Accept: application/json' --header "Authorization: Bearer $token"  "http://$API_HOST/v1/jobs/")
@@ -46,8 +57,10 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
   [ "$expected_job" == "$actual_job" ]
 }
 
-@test "test get job endpoint" {
+@test "test delete job endpoint" {
   code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE --header 'Accept: application/json' --header "Authorization: Bearer $token"  "http://$API_HOST/v1/jobs/1")
+  printf 'Expected: %s\n' 200
+  printf 'Actual: %s\n' "$code"
   [ "$code" -eq 200 ]
 }
 
