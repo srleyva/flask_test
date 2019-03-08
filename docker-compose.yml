@@ -23,6 +23,7 @@ services:
     ports:
      - "5432:5432"
   data_engine_api:
+    image: gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
     build: .
     volumes:
       - data_engine_api_vol:/data_engine_api

@@ -12,22 +12,32 @@ jobs:
           apk add postgresql-dev
           pip install tox
           tox
-  integration:
+  integration-publish:
     docker:
       - image: google/cloud-sdk
+    environment:
+      GOOGLE_PROJECT_ID: k8s-lab-225719
+      GOOGLE_COMPUTE_ZONE: us-east1-b
     steps:
       - checkout
       - setup_remote_docker
       - run: |
+          echo $GOOGLE_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+          gcloud auth configure-docker
           curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           chmod +x /usr/local/bin/docker-compose
           docker-compose up --exit-code-from test | grep test_1
+          docker-compose push --ignore-push-failures
+          docker tag gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:latest
+          docker push gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:latest
 
 workflows:
   version: 2
   build-package-deploy:
     jobs:
       - unit
-      - integration:
+      - integration-publish:
           requires:
             - unit
