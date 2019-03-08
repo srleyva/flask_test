@@ -96,7 +96,7 @@ class V1ServiceTest(unittest.TestCase):
         self.mock_data_engine.query.get.return_value = test_job
         response = self.app.delete('/v1/jobs/1', headers=self.headers)
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         self.mock_data_engine.query.get.assert_called_with(1)
         self.mock_job_queue.remove.assert_called_with(test_job)
 

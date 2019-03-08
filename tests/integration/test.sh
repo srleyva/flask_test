@@ -48,7 +48,7 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
 
 @test "test get job endpoint" {
   code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE --header 'Accept: application/json' --header "Authorization: Bearer $token"  "http://$API_HOST/v1/jobs/1")
-  [ "$code" -eq 204 ]
+  [ "$code" -eq 200 ]
 }
 
 @test "test put priority job endpoint" {

@@ -11,7 +11,6 @@ jobs:
           apk add --virtual build-deps gcc python-dev musl-dev
           apk add postgresql-dev
           pip install tox
-          pip install .
           tox
   integration:
     docker:

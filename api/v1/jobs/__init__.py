@@ -79,7 +79,7 @@ class JobsItems(Resource):
 
     @jwt_required
     @ns.doc(parser=parser)
-    @api.response(204, 'Job successfully deleted.')
+    @api.response(200, 'Job successfully deleted.')
     @api.response(404, 'Job not found.')
     def delete(self, job_id):
         '''Delete a job'''
@@ -90,19 +90,19 @@ class JobsItems(Resource):
                 f'Job not found {job_id}'
             )
         queue(job_queue).remove(job)
-        return {'success': 'true'}, 204
+        return {'success': 'true'}, 200
 
 
 @ns.route('/<int:job_id>/priority/<int:priority>')
 class JobPriority(Resource):
     @jwt_required
     @ns.doc(parser=parser)
-    @api.response(204, 'Job successfully updated.')
+    @api.response(200, 'Job successfully updated.')
     @api.response(404, 'Job not found.')
     def put(self, job_id, priority):
         '''Set the priority of job'''
         job = data_engine_job.query.get(job_id)
-        if job is None:
+        if job is None:  # pragma: no cover
             self.api.abort(
                 404,
                 f'Job not found {job_id}'
