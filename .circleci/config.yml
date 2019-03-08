@@ -32,6 +32,20 @@ jobs:
           docker-compose push --ignore-push-failures
           docker tag gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1} gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:latest
           docker push gcr.io/${GOOGLE_PROJECT_ID}/${CIRCLE_PROJECT_REPONAME}:latest
+  deploy-staging:
+    environment:
+      GOOGLE_PROJECT_ID: k8s-lab-225719
+      GOOGLE_COMPUTE_ZONE: us-east1-b
+    docker:
+      - image: sleyva97/chart:0.0.1
+    steps:
+      - checkout
+      - run:
+          name: Deploy to K8s Staging
+          environment:
+            CHART_COMMAND: install
+            CLUSTER_NAME: k8s-lab-staging
+          command: 'entrypoint'
 
 workflows:
   version: 2
@@ -41,3 +55,6 @@ workflows:
       - integration-publish:
           requires:
             - unit
+      - deploy-staging:
+          requires:
+            - integration-publish
