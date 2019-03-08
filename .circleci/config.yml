@@ -1,0 +1,38 @@
+# https://circleci.com/docs/2.0/language-python/
+version: 2
+jobs:
+  unit:
+    docker:
+      - image: python:alpine
+    steps:
+      - checkout
+      - run : |
+          apk update
+          apk add --virtual build-deps gcc python-dev musl-dev
+          apk add postgresql-dev
+          pip install tox
+          pip install .
+          tox
+  integration:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          echo $GOOGLE_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+          gcloud auth configure-docker
+          curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          docker-compose up --exit-code-from test | grep test_1
+
+workflows:
+  version: 2
+  build-package-deploy:
+    jobs:
+      - unit
+      - integration:
+          requires:
+            - unit
