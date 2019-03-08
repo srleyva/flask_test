@@ -5,6 +5,7 @@
 token=$(curl -s -X GET --header 'Accept: application/json' "http://$API_HOST/v1/system/token" | jq -r '.token')
 
 if [ ! -f .ran ]; then
+  sleep 5
   psql -h "$PSQL_HOST" -U postgres circle_test < structure.sql
   touch .ran
 fi
@@ -22,7 +23,7 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
   [ "$health" == "System is healthy" ]
 }
 
-@test "test protected get routes" {
+@test "test protected get routes fail with no token" {
   for route in $(curl -s http://localhost:5000/v1/swagger.json | jq -r '.paths | to_entries[].key' | grep -v system | grep -v priority); do 
     route=$(echo $route | sed 's/{account_id}/1/')
     route=$(echo $route | sed 's/{job_id}/1/')
