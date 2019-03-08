@@ -10,8 +10,8 @@ from api import settings
 
 log = logging.getLogger(__name__)
 
-api = Api(version='1.0', title='Job API',
-          description='A simple demonstration of a Flask RestPlus powered API')
+api = Api(version='1.0', title='Data Engine Job',
+          description='A demonstration of unit testing and integration')
 
 
 @api.errorhandler
