@@ -10,9 +10,7 @@ from api.databases import initialize_db
 app = Flask(__name__)
 jwt = JWTManager(app)
 
-# logging_conf_path = os.path.normpath(
-#         os.path.join(os.path.dirname(__file__), '../logging.conf'))
-# logging.config.fileConfig(logging_conf_path)
+logging.config.fileConfig(settings.LOGGING_CONF)
 log = logging.getLogger(__name__)
 
 
