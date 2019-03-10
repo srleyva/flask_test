@@ -12,6 +12,8 @@ jobs:
           apk add postgresql-dev
           pip install tox
           tox
+      - store_artifacts:
+          path: htmlcov
   integration-publish:
     docker:
       - image: google/cloud-sdk
