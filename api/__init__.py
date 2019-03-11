@@ -38,7 +38,7 @@ def initialize_app(flask_app, job_queue=None):
 def main():
     initialize_app(app)
     log.info(f'Starting server at http://{settings.FLASK_SERVER_NAME}/v1')
-    http_server = WSGIServer(('', 5000), app)
+    http_server = WSGIServer(('', 80), app)
     http_server.serve_forever()
 
 

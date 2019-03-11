@@ -3,7 +3,7 @@ services:
   test:
     build: tests/integration/
     environment:
-      API_HOST: 'data_engine_api:5000'
+      API_HOST: 'data_engine_api'
       PSQL_HOST: 'postgres'
     depends_on:
       - data_engine_api
