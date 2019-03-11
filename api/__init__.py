@@ -12,12 +12,8 @@ from api.databases import initialize_db
 app = Flask(__name__)
 jwt = JWTManager(app)
 
-try:
-    logging.config.fileConfig(settings.LOGGING_CONF)
-except KeyError:
-    logging.warn('Logging Conf not found')
-
-
+logging_conf_path = os.path.normpath(settings.LOGGING_CONF)
+logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
 
