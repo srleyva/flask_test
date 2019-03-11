@@ -4,7 +4,10 @@ import json
 import unittest
 from unittest.mock import Mock
 
+from psycopg2 import OperationalError
+
 import api
+from api.databases import db
 from api.services.job_queue import JobQueue
 from api.models.data_engine_job import DataEngineJob
 from api.services.source_tree import AccountSourceTree
@@ -35,8 +38,23 @@ class V1ServiceTest(unittest.TestCase):
     # Test System Routes
     def test_system_health(self):
         '''Test GET method on the /v1/system/health endpoint returns 200'''
+        mock_db = Mock(db)
+        api.v1.system.pg_db = mock_db
         response = self.app.get('v1/system/health')
+        mock_db.session.execute.assert_called()
         self.assertEqual(response.status_code, 200)
+
+    def test_system_health_with_bad_db(self):
+        '''Test GET method on the /v1/system/health endpoint returns 500'''
+        mock_db = Mock(db)
+        mock_db.session.execute.side_effect = OperationalError
+        api.v1.system.pg_db = mock_db
+        response = self.app.get('v1/system/health')
+        health = json.loads(response.data)
+
+        self.assertEqual(health['database'], False)
+        self.assertEqual(health['ready'], False)
+        self.assertEqual(response.status_code, 500)
 
     def test_system_metrics(self):
         '''Test GET method on the /v1/system/metrics endpoint returns 200'''
