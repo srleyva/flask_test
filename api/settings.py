@@ -1,7 +1,10 @@
 import os
 
+# Custom API
+LOGGING_CONF = os.environ.get('API_LOGGING_CONF', 'logging.conf')
+
 # Flask settings
-FLASK_SERVER_NAME = os.environ.get('API_SERVER_NAME', 'localhost:8888')
+FLASK_SERVER_NAME = os.environ.get('API_SERVER_NAME', 'localhost:5000')
 FLASK_DEBUG = os.environ.get('API_DEBUG', False)
 
 # Flask-Restplus settings

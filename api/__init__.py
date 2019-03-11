@@ -1,7 +1,9 @@
+import os
 import logging.config
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from gevent.pywsgi import WSGIServer
 
 from api import settings
 from api.v1.namespaces import blueprint, configure_api
@@ -10,9 +12,8 @@ from api.databases import initialize_db
 app = Flask(__name__)
 jwt = JWTManager(app)
 
-# logging_conf_path = os.path.normpath(
-#         os.path.join(os.path.dirname(__file__), '../logging.conf'))
-# logging.config.fileConfig(logging_conf_path)
+logging_conf_path = os.path.normpath(settings.LOGGING_CONF)
+logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
 
@@ -36,7 +37,9 @@ def initialize_app(flask_app, job_queue=None):
 
 def main():
     initialize_app(app)
-    app.run(debug=settings.FLASK_DEBUG, host='0.0.0.0')
+    log.info(f'Starting server at http://{settings.FLASK_SERVER_NAME}/v1')
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
 
 
 if __name__ == "__main__":
