@@ -19,12 +19,12 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
 }
 
 @test "test status endpoint" {
-  health=$(curl -s -X GET --header 'Accept: application/json' "http://$API_HOST/v1/system/health" | jq -r '.message')
-  [ "$health" == "System is healthy" ]
+  code=$(curl -s -o /dev/null -w "%{http_code}" http://$API_HOST/v1/system/health)
+  [ "$code" -eq 200 ]
 }
 
 @test "test protected get routes fail with no token" {
-  for route in $(curl -s http://localhost:5000/v1/swagger.json | jq -r '.paths | to_entries[].key' | grep -v system | grep -v priority); do 
+  for route in $(curl -s http://localhost:5000/v1/swagger.json | jq -r '.paths | to_entries[].key' | grep -v system | grep -v priority); do
     route=$(echo $route | sed 's/{account_id}/1/')
     route=$(echo $route | sed 's/{job_id}/1/')
     route=$(echo $route | sed 's/{priority}/1/')
