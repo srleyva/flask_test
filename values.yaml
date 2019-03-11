@@ -3,3 +3,5 @@ image:
   repository: gcr.io/k8s-lab-225719/data_engine_job_api
   tag: latest
   pullPolicy: Always
+service:
+  type: LoadBalancer
