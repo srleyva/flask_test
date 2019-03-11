@@ -1,7 +1,9 @@
+import os
 import logging.config
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from gevent.pywsgi import WSGIServer
 
 from api import settings
 from api.v1.namespaces import blueprint, configure_api
@@ -39,7 +41,9 @@ def initialize_app(flask_app, job_queue=None):
 
 def main():
     initialize_app(app)
-    app.run(debug=settings.FLASK_DEBUG, host='0.0.0.0')
+    log.info(f'Starting server at http://{settings.FLASK_SERVER_NAME}/v1')
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
 
 
 if __name__ == "__main__":
