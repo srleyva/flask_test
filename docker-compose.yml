@@ -36,7 +36,7 @@ services:
     networks:
       - overlay
     ports:
-     - "5000:5000"
+     - "80:80"
 
 volumes:
   data_engine_api_vol:
