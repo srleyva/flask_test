@@ -18,6 +18,11 @@ psql -h "$PSQL_HOST" -U postgres circle_test < populate.sql 2>&1> /dev/null
   [ "$?" -eq 0 ]
 }
 
+@test "test token claims" {
+  identity=$(curl -s -X POST --header 'Accept: application/json' --header "Authorization: Bearer $token" "http://$API_HOST/v1/system/token" | jq -r '.identity')
+  [ "$identity" == "temp-system" ]
+}
+
 @test "test status endpoint" {
   code=$(curl -s -o /dev/null -w "%{http_code}" http://$API_HOST/v1/system/health)
   [ "$code" -eq 200 ]

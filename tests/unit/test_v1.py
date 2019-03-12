@@ -36,6 +36,12 @@ class V1ServiceTest(unittest.TestCase):
         self.headers = {'Authorization': f'Bearer {token}'}
 
     # Test System Routes
+    def test_put_token(self):
+        '''TEST PUT method on the /v1/system/token returns claims'''
+        response = self.app.post('v1/system/token', headers=self.headers)
+        claims = json.loads(response.data)
+        self.assertEqual(claims['identity'], 'temp-system')
+
     def test_system_health(self):
         '''Test GET method on the /v1/system/health endpoint returns 200'''
         mock_db = Mock(db)

@@ -2,7 +2,10 @@ import logging
 
 from flask import Response
 from flask_restplus import Resource, fields
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+    create_access_token, jwt_required, get_raw_jwt,
+    create_refresh_token
+)
 from sqlalchemy.sql import text
 from prometheus_client import generate_latest
 
@@ -21,10 +24,22 @@ health_model = ns.model('health', {
 
 @ns.route('/token')
 class Token(Resource):
+    '''This Resource handles the token methods'''
     @api.doc('create_token')
     def get(self):
+        '''Creates a new token'''
         access_token = create_access_token("temp-system")
-        return {'token': access_token}, 200
+        refresh_token = create_refresh_token("temp-system")
+        return {'token': access_token,
+                'refresh': refresh_token}, 200
+
+    @api.doc('token_info')
+    @jwt_required
+    def post(self):
+        '''Gets token information'''
+        claims = get_raw_jwt()
+        print(claims)
+        return claims, 200
 
 
 @ns.route('/health')
