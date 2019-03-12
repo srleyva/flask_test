@@ -3,13 +3,10 @@ version: 2
 jobs:
   unit:
     docker:
-      - image: python:alpine
+      - image: python:3.7-slim
     steps:
       - checkout
       - run : |
-          apk update
-          apk add --virtual build-deps gcc python-dev musl-dev
-          apk add postgresql-dev
           pip install tox
           tox
       - store_artifacts:
