@@ -1,0 +1,6 @@
+FROM python:alpine
+
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev py-gevent && \
+    pip install gevent psycopg2-binary

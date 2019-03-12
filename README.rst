@@ -2,6 +2,8 @@
 Data Engine Job API
 ===================
 
+* Not gevent need to be replaced as it increased the integration and build time by over 300%
+
 
 |build| |coverage|
 
