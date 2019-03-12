@@ -18,6 +18,15 @@ log = logging.getLogger(__name__)
 
 
 def configure_app(flask_app):
+    '''
+    Sets configuration options on the application from settings
+
+    Parameters
+    ----------
+    flask_app : Flask
+        instance of the flask application
+    '''
+
     # flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI # NOQA
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = settings.SQLALCHEMY_TRACK_MODIFICATIONS # NOQA
@@ -29,6 +38,17 @@ def configure_app(flask_app):
 
 
 def initialize_app(flask_app, job_queue=None):
+    '''
+    Sets up and initializes routes, database and services
+
+    Parameters
+    ----------
+    flask_app : Flask
+        instance of the flask application
+    job_queue : None
+        a hook that allows for a mock injection
+        if set to none it will default to api.services.job_queue.JobQueue
+    '''
     configure_api(job_queue)
     configure_app(flask_app)
     initialize_db(flask_app)

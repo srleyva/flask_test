@@ -14,8 +14,7 @@ parser.add_argument(
     type=str,
     location='headers',
     help='Bearer Access Token',
-    required=True
-    )
+    required=True)
 
 job_queue = None
 account_tree = AccountSourceTree
