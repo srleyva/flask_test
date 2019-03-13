@@ -14,6 +14,13 @@ from api.databases import db
 
 ns = api.namespace('system', description='Information about the API System')
 pg_db = db
+parser = ns.parser()
+parser.add_argument(
+    'Authorization',
+    type=str,
+    location='headers',
+    help='Bearer Access Token',
+    required=True)
 
 health_model = ns.model('health', {
     'database': fields.Boolean,
@@ -35,6 +42,7 @@ class Token(Resource):
 
     @api.doc('token_info')
     @jwt_required
+    @ns.doc(parser=parser)
     def post(self):
         '''Gets token information'''
         claims = get_raw_jwt()
