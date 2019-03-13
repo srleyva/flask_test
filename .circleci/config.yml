@@ -45,6 +45,20 @@ jobs:
             CHART_COMMAND: install
             CLUSTER_NAME: k8s-lab-staging
           command: 'entrypoint'
+  deploy-prod:
+    environment:
+      GOOGLE_PROJECT_ID: k8s-lab-225719
+      GOOGLE_COMPUTE_ZONE: us-east1-b
+    docker:
+      - image: sleyva97/chart:0.0.1
+    steps:
+      - checkout
+      - run:
+          name: Deploy to K8s Staging
+          environment:
+            CHART_COMMAND: install
+            CLUSTER_NAME: k8s-lab-prod
+          command: 'entrypoint'
 
 workflows:
   version: 2
@@ -57,3 +71,6 @@ workflows:
       - deploy-staging:
           requires:
             - integration-publish
+      - deploy-prod:
+          requires:
+            - deploy-staging
