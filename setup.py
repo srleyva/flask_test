@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
 import re
+import os
+
+requirements = os.environ.get('API_REQUIRES', 'requirements.txt')
 
 required = [l.strip() for l in
-            open('requirements.txt') if re.match('^[A-Za-z]', l)]
+            open(requirements) if re.match('^[A-Za-z]', l)]
 
 setup(
     name='api',

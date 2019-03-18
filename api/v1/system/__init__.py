@@ -12,6 +12,8 @@ from prometheus_client import generate_latest
 from api.v1.restplus import api
 from api.databases import db
 
+log = logging.getLogger(__name__)
+
 ns = api.namespace('system', description='Information about the API System')
 pg_db = db
 parser = ns.parser()
@@ -28,25 +30,45 @@ health_model = ns.model('health', {
     'ready': fields.Boolean,
 })
 
+token_model = ns.model('token', {
+    'token': fields.String,
+    'refresh': fields.String,
+})
+
 
 @ns.route('/token')
 class Token(Resource):
-    '''This Resource handles the token methods'''
+    """This handles method on the JWT token
+
+    This class will generate and parse JWT tokens
+    passed from the client
+    """
     @api.doc('create_token')
+    @ns.marshal_with(token_model)
     def get(self):
-        '''Creates a new token'''
+        """
+        Generates a JWT and refresh token
+
+        :return: token_model
+        """
         access_token = create_access_token("temp-system")
         refresh_token = create_refresh_token("temp-system")
-        return {'token': access_token,
-                'refresh': refresh_token}, 200
+        tokens = {
+            "token": access_token,
+            "refresh": refresh_token,
+        }
+        return tokens, 200
 
     @api.doc('token_info')
     @jwt_required
     @ns.doc(parser=parser)
     def post(self):
-        '''Gets token information'''
+        """
+        Parses claims from the JWT
+
+        :return: dict
+        """
         claims = get_raw_jwt()
-        print(claims)
         return claims, 200
 
 
@@ -55,6 +77,15 @@ class Health(Resource):
     @api.doc('get_health')
     @ns.marshal_with(health_model)
     def get(self):
+        """
+        Check the health of the system
+        and returns to client
+
+        Check the health of the DB and API
+
+        :return: health, http status code
+        :rtype: api.v1.system.health_model, int
+        """
         status_code = 200
         database = True
         application = True
@@ -79,5 +110,10 @@ class Health(Resource):
 class Metrics(Resource):
     @api.doc('get_metrics')
     def get(self):
+        """
+        Generates and returns Prometheus metrics
+
+        :return: flask.Response
+        """
         CONTENT_TYPE_LATEST = str('text/plain; version=0.0.4; charset=utf-8')
         return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)

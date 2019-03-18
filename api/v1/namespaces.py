@@ -1,21 +1,22 @@
+import logging
+
 from flask import Blueprint
 
 from api.v1.restplus import api
 from api.v1 import system, jobs
 
 blueprint = Blueprint('api', __name__, url_prefix='/v1')
+log = logging.getLogger(__name__)
 
 
 def configure_api(job_queue):
-    '''Injects job_queue
+    """
+    Place to inject needed external dependencies
+    the API may have
 
-    The only purpose is a hook to inject a mock
-
-    Parameters
-    ----------
-    job_queue : api.services.job_queue.JobQueue
-        None default to JobQueue
-    '''
+    :param job_queue: Hook to inject job_queue dependency
+    :type job_queue: unittest.mock.Mock
+    """
 
     jobs.job_queue = job_queue
 

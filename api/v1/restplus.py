@@ -16,15 +16,13 @@ api = Api(version='1.0', title='Data Engine Job',
 
 @api.errorhandler
 def default_error_handler(e):  # pragma: no cover
-    '''Default errorhandler for API
+    """
+    Default error handler for the Flask API
 
-    Prevents the sending of server logs to client
-
-    Parameters
-    ----------
-    e : Exception
-        passed from flask app
-    '''
+    :param e: passed exception from flask
+    :type e: Exception
+    :return: dict, int
+    """
 
     message = 'An unhandled exception occurred.'
     log.exception(message)
@@ -35,17 +33,13 @@ def default_error_handler(e):  # pragma: no cover
 
 @api.errorhandler(NoResultFound)
 def database_not_found_error_handler(e):  # pragma: no cover
-    '''Handles if database object not found
+    """
+    Handles if database item is not found
 
-    Prevents the sending of server logs to client
-    while informing the client database object doesn't exist
-    gracefully handling this exception
-
-    Parameters
-    ----------
-    e : Exception
-        passed from flask app
-    '''
+    :param e: passed exception from flask
+    :type e: Exception
+    :return: dict, int
+    """
 
     log.warning(traceback.format_exc())
     return {'message': 'database result was required but none was found.'}, 404
@@ -54,12 +48,12 @@ def database_not_found_error_handler(e):  # pragma: no cover
 @api.errorhandler(NoAuthorizationError)
 @api.errorhandler(InvalidHeaderError)
 def no_token_found(e):  # pragma: no cover
-    '''Handles if jwt token is invalid
+    """
+    Handles if JWT it not valid or null
 
-    Parameters
-    ----------
-    e : Exception
-        passed from flask app
-    '''
+    :param e: passed exception from flask
+    :type e: Exception
+    :return: dict, int
+    """
 
     return {'message': 'Bad Token'}, 400

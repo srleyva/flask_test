@@ -1,3 +1,5 @@
+import logging
+
 from flask import jsonify
 from flask_restplus import Resource
 from flask_jwt_extended import jwt_required
@@ -6,6 +8,8 @@ from api.v1.restplus import api
 from api.models.data_engine_job import DataEngineJob, JobSchema
 from api.services.job_queue import JobQueue
 from api.services.source_tree import AccountSourceTree
+
+log = logging.getLogger(__name__)
 
 ns = api.namespace('jobs', description='Job Related information')
 parser = ns.parser()
